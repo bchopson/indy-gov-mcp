@@ -36,6 +36,12 @@ async def search_address(address_fragment: str) -> Optional[Dict[str, Any]]:
             else:
                 logger.error(f"No address found for: {address_fragment}")
                 return None
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 422:
+                logger.warning("retrying without the street type")
+                return await search_address(" ".join(address_fragment.split(" ")[:-1]))
+            logger.error(f"HTTP error calling search_gis_address API: {e}")
+            return None
         except httpx.RequestError as e:
             logger.error(f"Error calling search_gis_address API: {e}")
             return None
@@ -120,11 +126,11 @@ async def get_trash_pickup_details(
 @mcp.tool()
 async def get_indy_trash_day(address: str) -> str:
     """Get the trash pickup day for an Indianapolis address.
-    
+
     Args:
-        address: Street number and name only (e.g. "1234 Main Street"). 
+        address: Street number and name only (e.g. "1234 Main Street").
                 Do not include city, state, or zip code.
-    
+
     Returns:
         A string describing the trash pickup schedule.
     """
