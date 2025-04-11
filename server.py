@@ -119,7 +119,16 @@ async def get_trash_pickup_details(
 
 @mcp.tool()
 async def get_indy_trash_day(address: str) -> str:
-    """MCP Tool implementation to find the trash pickup day."""
+    """Get the trash pickup day for an Indianapolis address.
+    
+    Args:
+        address: Street number and name only (e.g. "1234 Main Street"). 
+                Do not include city, state, or zip code.
+    
+    Returns:
+        A string describing the trash pickup schedule.
+    """
+
     logger.info(f"Received request for address: {address}")
 
     # 1. Search/Validate Address
